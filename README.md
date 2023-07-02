@@ -1,4 +1,4 @@
 # passwords-generator
-[TOC]
+[ToC]
 ## usage
 cargo run -- --help
