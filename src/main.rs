@@ -1,14 +1,14 @@
-
 pub mod genchars;
 
 use clap::Parser;
+use itertools::Itertools;
+use std::fs::File;
+use std::io::Write;
 use std::mem;
-use itertools::{Itertools};
-use std::time::{Instant};
+use std::time::Instant;
 
 use crate::genchars::gen_all_chars;
 
-/// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
@@ -27,20 +27,29 @@ fn main() {
     if args.min_size > args.max_size {
         mem::swap(&mut args.min_size, &mut args.max_size);
     }
-    println!("Password lenght: {:?}, {:?} ", args.min_size, args.max_size );
-    
-    let characters = gen_all_chars();
+    println!("Password lenght: {:?}, {:?} ", args.min_size, args.max_size);
 
-    let mut all_perm : Vec<Vec<char>> = Vec::new();
-    for n in args.min_size..args.max_size+1 {
-        _ = characters.clone().into_iter().permutations(n.try_into().unwrap()).for_each(|f| {all_perm.push(f);});
+    let characters = gen_all_chars();
+    let mut nb_perm = 0;
+    let mut f_password = File::create("passwords.txt").expect("Unable to create file");
+    
+    for n in args.min_size..args.max_size + 1 {
+        _ = characters
+            .clone()
+            .into_iter()
+            .permutations(n.try_into().unwrap())
+            .for_each(|perm| {
+                nb_perm += 1;
+                _ = write!(f_password, "{}\n", perm.into_iter().collect::<String>());
+                //println!("{}", perm.into_iter().collect::<String>());
+            });
     }
     let duration = start.elapsed();
 
-    let start_print = Instant::now();
-    for perm in &all_perm {
-       println!("{:?}", perm);
-    }
-    let duration_print = start_print.elapsed();
-    println!("generated {} permutation, with {} possible characters in {:?}. time to display all these is {:?}", all_perm.len(), characters.len(), duration, duration_print);
+    println!(
+        "generated {} permutation, with {} possible characters in {:?}.",
+        nb_perm,
+        characters.len(),
+        duration
+    );
 }
