@@ -5,7 +5,7 @@ use itertools::Itertools;
 use std::fs::File;
 use std::io::Write;
 use std::mem;
-use std::time::Instant;
+use std::time::{Instant, Duration};
 
 use crate::genchars::gen_all_chars;
 
@@ -21,6 +21,9 @@ struct Cli {
     /// name of the output file
     #[arg(long, short, default_value_t = String::from("output.txt"))]
     output_file_name: String,
+    /// Delay in ms to wait between every permutation
+    #[arg(long, short, default_value_t = 0)]
+    delay_ms: u64,
 }
 
 fn main() {
@@ -45,6 +48,7 @@ fn main() {
                 nb_perm += 1;
                 _ = write!(f_password, "{}\n", perm.into_iter().collect::<String>());
                 //println!("{}", perm.into_iter().collect::<String>());
+                std::thread::sleep(Duration::from_millis(args.delay_ms));
             });
     }
     let duration = start.elapsed();
