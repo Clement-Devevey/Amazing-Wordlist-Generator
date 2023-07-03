@@ -1,6 +1,8 @@
 pub mod genchars;
+pub mod cli;
+pub mod output_mode;
 
-use clap::{Parser, ValueEnum};
+use clap::Parser;
 use itertools::Itertools;
 use std::fs::File;
 use std::io;
@@ -8,35 +10,9 @@ use std::io::Write;
 use std::mem;
 use std::time::{Instant, Duration};
 
+use crate::cli::Cli;
 use crate::genchars::gen_all_chars;
-
-#[derive(Parser)]
-#[command(author="kekopom & Macronimous", version, about, long_about = "An amazing wordlist generator made in rust.")]
-struct Cli {
-    /// min size of the password
-    #[arg(long)]
-    min_size: i8,
-    /// max size of the password
-    #[arg(long)]
-    max_size: i8,
-    /// name of the output file
-    #[arg(long, short, default_value_t = String::from("output.txt"))]
-    output_file_name: String,
-    /// Delay in ms to wait between every permutation
-    #[arg(long, short, default_value_t = 0)]
-    delay_ms: u64,
-    /// output mode
-    #[arg(short, long, value_enum, default_value_t = OutputMode::File)]
-    mode: OutputMode,
-}
-
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-enum OutputMode {
-    /// Output will be console
-    Console,
-    /// Output will be file
-    File,
-}
+use crate::output_mode::OutputMode;
 
 fn main() {
     let start = Instant::now();
