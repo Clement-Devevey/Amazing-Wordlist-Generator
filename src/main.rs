@@ -10,7 +10,7 @@ use std::time::Instant;
 use crate::genchars::gen_all_chars;
 
 #[derive(Parser)]
-#[command(author, version, about, long_about = None)]
+#[command(author="kekopom & Macronimous", version, about, long_about = "An amazing wordlist generator made in rust.")]
 struct Cli {
     /// min size of the password
     #[arg(long)]
@@ -18,6 +18,9 @@ struct Cli {
     /// max size of the password
     #[arg(long)]
     max_size: i8,
+    /// name of the output file
+    #[arg(long, short, default_value_t = String::from("output.txt"))]
+    output_file_name: String,
 }
 
 fn main() {
@@ -31,7 +34,7 @@ fn main() {
 
     let characters = gen_all_chars();
     let mut nb_perm = 0;
-    let mut f_password = File::create("passwords.txt").expect("Unable to create file");
+    let mut f_password = File::create(args.output_file_name).expect("Unable to create file");
     
     for n in args.min_size..args.max_size + 1 {
         _ = characters
